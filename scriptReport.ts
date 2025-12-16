@@ -14,7 +14,6 @@ interface Row {
   stock_status: string;
 }
 
-// @ts-ignore
 function main(workbook: ExcelScript.Workbook) {
   // == Globals ==
 
@@ -32,7 +31,14 @@ function main(workbook: ExcelScript.Workbook) {
   const bussinesDay = new Date();
 
   saturday.setDate(date.getDate() - date.getDay() + 7);
-  bussinesDay.setDate(date.getDate() - date.getDay() + 7 + (date.getDay() > 1 ? 5 : 0));
+  bussinesDay.setDate(date.getDate() - date.getDay() + 7);
+
+  if (date.getDay() > 1) {
+    bussinesDay.setDate(bussinesDay.getDate() + date.getDay() - 1);
+  }
+
+  console.log("Saturday: " + saturday.toISOString());
+  console.log("bussiness: " + bussinesDay.toISOString());
 
 
   const inventoryNameSheet = `Inventory Report ${(date.getMonth() + 1) > 9 ? date.getMonth() + 1 : '0' + date.getMonth()}${date.getDate() > 9 ? date.getDate() : '0' + date.getDate()}${date.getFullYear().toString().substring(2)}`;
@@ -183,7 +189,10 @@ function main(workbook: ExcelScript.Workbook) {
 
   const verifyDate = (Working_Sheet: ExcelScript.Worksheet) => {
     const rawCell = Working_Sheet.getRange(`I${currentRowIndex}`);
-    const raw = rawCell.getValue().toString().trim();
+    let raw = rawCell.getValue().toString().trim();
+    raw = raw.replace(/, /g, ',');
+    raw = raw.replace(/  /g, ' ');
+    raw = raw.replace(/ /g, '\n');
     const today = new Date();
 
     if (raw == '') {
@@ -194,12 +203,13 @@ function main(workbook: ExcelScript.Workbook) {
     const dates = raw.split('\n');
     let sumatory = 0;
     const charIndex = 0;
+    
     dates.forEach((dateR) => {
       const fv1 = Working_Sheet.getRange(`F${currentRowIndex}`).getValue().toString();
       const fv2 = Working_Sheet.getRange(`H${currentRowIndex}`).getValue().toString();
       const dateRow = new Date(dateR.split(',')[1]);
 
-      if (dateRow.getTime() < (saturday.getTime() + 1000)) {
+      if (dateRow.getTime() < saturday.getTime()) {
         sumatory += parseInt(dateR.split(',')[3]);
       }
 
