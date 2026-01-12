@@ -98,7 +98,7 @@ function main(workbook: ExcelScript.Workbook, semana: string) {
 
     valueAxis.setMaximum((Math.round(totalQty[0][0] as number / 3000) + 1) * 3000);
 
-    const image = chart.getImage(3000,600, ExcelScript.ImageFittingMode.fitAndCenter)
+    const image = chart.getImage(4000,700, ExcelScript.ImageFittingMode.fitAndCenter)
     selectedSheet.addImage(image);
 
     sheet.delete();
